@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -e
+set -x
 
 shopt -s dotglob
 echo "--> Installing application source"
@@ -18,19 +19,20 @@ fi
 
 #have to break this down further, to append in data rather than replace
 if [ -d "$HOME/config" ]; then
-  if [-f "$HOME/config/server.xml" ]; then
-   echo "---> Copy server.xml to /config/project directory"
-   cp $HOME/config/server.xml /config/project/
-  fi
-
-  if [-f "$HOME/config/server.env"]; then
-    echo "--->Append $HOME/config/server.env to /config/server.env"
-    cat $HOME/config/server.env >> /config/server.env
-  fi
-
-  if [ -f "$HOME/config/jvm.options"]; then
-    echo "---> Append $HOME/config/jvm.options to /config/jvm.options"
-    cat $HOME/config/jvm.options >> /config.jvm.options
+  echo "code made it here"
+  # if [-f "$HOME/config/server.xml" ]; then
+  #  echo "---> Copy server.xml to /config/project directory"
+  #  cp $HOME/config/server.xml /config/project/
+  # fi
+  #
+  # if [-f "$HOME/config/server.env"]; then
+  #   echo "--->Append $HOME/config/server.env to /config/server.env"
+  #   cat $HOME/config/server.env >> /config/server.env
+  # fi
+  #
+  # if [ -f "$HOME/config/jvm.options"]; then
+  #   echo "---> Append $HOME/config/jvm.options to /config/jvm.options"
+  #   cat $HOME/config/jvm.options >> /config.jvm.options
 fi
 
 #fix source directory permissions
