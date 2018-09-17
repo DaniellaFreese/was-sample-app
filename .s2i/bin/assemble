@@ -31,7 +31,7 @@ if [ -d "$HOME/config" ]; then
 
   if [ -f "$HOME/config/jvm.options" ]; then
      echo "---> Append $HOME/config/jvm.options to /config/jvm.options"
-     cat $HOME/config/jvm.options >> /config.jvm.options
+     cat $HOME/config/jvm.options >> /config/jvm.options
   fi
 fi
 
