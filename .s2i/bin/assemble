@@ -1,0 +1,37 @@
+#!/bin/bash
+
+set -e
+
+shopt -s dotglob
+echo "--> Installing application source"
+mv /tmp/src/* ./
+
+#echo copy anything in $WORKDIR/artifacts to dropins
+#cp -R $WORKDIR/artifacts/* /config/dropins/
+#echo copy anything in $WORKDIR/config to config
+#cp -R $WORKDIR/config/*  /config
+
+if [ -d "$HOME/artifacts" ]; then
+  echo "---> Copy anything in $HOME/artifacts to dropins"
+  cp -R $HOME/artifacts/* /config/dropins/
+fi
+
+#have to break this down further, to append in data rather than replace
+if [ -d "$HOME/config" ]; then
+  if [-f "$HOME/config/server.xml" ]; then
+   echo "---> Copy server.xml to /config/project directory"
+   cp $HOME/config/server.xml /config/project/
+  fi
+
+  if [-f "$HOME/config/server.env"]; then
+    echo "--->Append $HOME/config/server.env to /config/server.env"
+    cat $HOME/config/server.env >> /config/server.env
+  fi
+
+  if [ -f "$HOME/config/jvm.options"]; then
+    echo "---> Append $HOME/config/jvm.options to /config/jvm.options"
+    cat $HOME/config/jvm.options >> /config.jvm.options
+fi
+
+#fix source directory permissions
+fix-permissions ./
