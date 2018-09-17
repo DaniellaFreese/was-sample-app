@@ -24,7 +24,7 @@ objects:
         name: ${IS_NAME}:${TAG}
     source:
       git:
-        uri: 
+        uri: https://github.com/DaniellaFreese/was-sample-app.git
         ref: master
     strategy:
       sourceStrategy:
