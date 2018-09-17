@@ -1,0 +1,141 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: was-template
+  annotations:
+    description: was-app
+objects:
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: ${IS_NAME}
+    labels:
+      app: ${APP_NAME}
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      app: ${APP_NAME}
+    name: ${APP_NAME}
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ${IS_NAME}:${TAG}
+    source:
+      git:
+        uri: 
+        ref: master
+    strategy:
+      sourceStrategy:
+        from:
+          kind: ImageStreamTag
+          name: was-s2i-kernel:7
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    generation: 1
+    labels:
+      app: was
+    name: was
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      app: was
+      deploymentconfig: was
+    strategy:
+      activeDeadlineSeconds: 21600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        annotations:
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          app: was
+          deploymentconfig: was
+      spec:
+        containers:
+        - image: ${APP_NAME}:${TAG}
+          imagePullPolicy: Always
+          name: was
+          ports:
+          - containerPort: 9080
+            protocol: TCP
+          - containerPort: 9443
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - name: app-certs
+            mountPath: /var/run/secrets/openshift.io/app-certs
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: app-certs
+          secret:
+            secretName: app-certs
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - was
+        from:
+          kind: ImageStreamTag
+          name: ${IS_NAME}:${TAG}
+      type: ImageChange
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+      service.alpha.openshift.io/serving-cert-secret-name: app-certs
+    creationTimestamp: null
+    labels:
+      app: was
+    name: was
+  spec:
+    ports:
+    - name: 9080-tcp
+      port: 9080
+      protocol: TCP
+      targetPort: 9080
+    - name: 9443-tcp
+      port: 9443
+      protocol: TCP
+      targetPort: 9443
+    selector:
+      app: was
+      deploymentconfig: was
+    sessionAffinity: None
+    type: ClusterIP
+parameters:
+- name: IS_NAME
+  description: ImageStream name for the app
+  value: was
+  required: true
+- name: APP_NAME
+  description: Name of the app
+  value: was
+  required: true
+- name: TAG
+  description: TAG of the image stream tag
+  value: latest
+  required: true
