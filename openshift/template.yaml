@@ -23,9 +23,8 @@ objects:
         kind: ImageStreamTag
         name: ${IS_NAME}:${TAG}
     source:
-      git:
-        uri: https://github.com/DaniellaFreese/was-sample-app.git
-        ref: master
+      type: Binary
+      binary: {} 
     strategy:
       sourceStrategy:
         from:
